@@ -1,0 +1,31 @@
+172.18.0.1 - - [17/Sep/2020 23:49:43] "GET / HTTP/1.1" 404 -
+CombinedMultiDict(
+    [
+        ImmutableMultiDict([]), 
+        ImmutableMultiDict(
+            [
+                ('ToCountry', 'US'), 
+                ('MediaContentType0', 'image/jpeg'), 
+                ('ToState', 'CO'), 
+                ('SmsMessageSid', 'MMf2fc073143f45025f977aaeb0727870f'), 
+                ('NumMedia', '1'), 
+                ('ToCity', ''), 
+                ('FromZip', '80204'), 
+                ('SmsSid', 'MMf2fc073143f45025f977aaeb0727870f'), 
+                ('FromState', 'CO'), 
+                ('SmsStatus', 'received'), 
+                ('FromCity', 'DENVER'), 
+                ('Body', 'Bears'), 
+                ('FromCountry', 'US'), 
+                ('To', '+17207067007'), 
+                ('ToZip', ''), 
+                ('NumSegments', '1'), 
+                ('MessageSid', 'MMf2fc073143f45025f977aaeb0727870f'), 
+                ('AccountSid', 'AC51065da8ef8171360073ba0023137ba3'), 
+                ('From', '+17202893130'), 
+                ('MediaUrl0', 'https://api.twilio.com/2010-04-01/Accounts/AC51065da8ef8171360073ba0023137ba3/Messages/MMf2fc073143f45025f977aaeb0727870f/Media/ME92c5e0e27c5af5e03314cbba0f6f3517'), 
+                ('ApiVersion', '2010-04-01')
+            ]
+        )
+    ]
+)

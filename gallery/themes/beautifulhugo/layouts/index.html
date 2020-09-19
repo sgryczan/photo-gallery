@@ -1,0 +1,9 @@
+{{ define "main" }}
+  <div role="main" class="container">
+    {{ with .Content }}
+      <div class="posts-list">
+        {{.}}
+      </div>
+    {{ end }}
+  </div>
+{{ end }}
