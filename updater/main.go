@@ -144,7 +144,7 @@ func ParseObjects(o *s3.ListObjectsV2Output) ([]string, error) {
 		if c := obj.Metadata["Caption"]; c != nil {
 			caption = *c
 		}
-		line := fmt.Sprintf(`{{< figure link="http://files.czan.io/%s" caption="%s" >}}`, *o.Key, caption)
+		line := fmt.Sprintf(`{{< figure link="https://files.czan.io/%s" caption="%s" >}}`, *o.Key, caption)
 		result = append(result, line)
 	}
 	return result, nil
