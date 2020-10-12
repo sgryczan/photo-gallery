@@ -168,7 +168,12 @@ func S3UploadFile(input *s3manager.UploadInput) error {
 
 // IsWhiteListed determines if the sending number is allowed to post
 func IsWhiteListed(number string, allowed *[]string) bool {
-	return true
+	for _, n := range *allowed {
+		if n == number {
+			return true
+		}
+	}
+	return false
 }
 
 // InvokeUpdate invokes the update API

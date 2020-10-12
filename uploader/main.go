@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -25,6 +26,8 @@ func main() {
 	handlers.DestinationBucket = os.Getenv("S3_BUCKET")
 	handlers.GalleryUpdateURL = os.Getenv("UPDATE_API_URL")
 	awsRegion := os.Getenv("AWS_REGION")
+	allowedSenders := os.Getenv("ALLOWED_SENDERS")
+	handlers.AllowedSenders = strings.Split(allowedSenders, ",")
 
 	if awsRegion == "" {
 		log.Printf("AWS_REGION not set. Defaulting to us-east-1")

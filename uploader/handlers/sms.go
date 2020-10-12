@@ -18,6 +18,7 @@ var DestinationBucket string
 var GalleryUpdateURL string
 var S3AccessKey string
 var S3SecretKeyID string
+var AllowedSenders []string
 
 // SMSHandler accepts inbound MMS messages and copies media to S3
 func SMSHandler(w http.ResponseWriter, r *http.Request) {
@@ -34,7 +35,7 @@ func SMSHandler(w http.ResponseWriter, r *http.Request) {
 	//   in: body
 	//   description: MMS Message from Twilio
 	//   required: true
-	//   example: ToCountry=US&MediaContentType0=image%2Fjpeg&ToState=CO&SmsMessageSid=MM0ab821fa95eeecea1eadd2f9d2414997&NumMedia=1&ToCity=&FromZip=80204&SmsSid=MM0ab821fa95eeecea1eadd2f9d2414997&FromState=CO&SmsStatus=received&FromCity=DENVER&Body=Test&FromCountry=US&To=%2B17207067007&ToZip=&NumSegments=1&MessageSid=MM0ab821fa95eeecea1eadd2f9d2414997&AccountSid=AC51065da8ef8171360073ba0023137ba3&From=%2B17202893130&MediaUrl0=https%3A%2F%2Fapi.twilio.com%2F2010-04-01%2FAccounts%2FAC51065da8ef8171360073ba0023137ba3%2FMessages%2FMM0ab821fa95eeecea1eadd2f9d2414997%2FMedia%2FMEcf6f27737f63106f76c895195ade7a29&ApiVersion=2010-04-01
+	//   example: ToCountry=US&MediaContentType0=image%2Fjpeg&ToState=CO&SmsMessageSid=MM0ab821fa95eeecea1eadd2f9d2414997&NumMedia=1&ToCity=&FromZip=80204&SmsSid=MM0ab821fa95eeecea1eadd2f9d2414997&FromState=CO&SmsStatus=received&FromCity=DENVER&Body=Test&FromCountry=US&To=%2B18881112233&ToZip=&NumSegments=1&MessageSid=MM0ab821fa95eeecea1eadd2f9d2414997&AccountSid=AC51065da8ef8171360073ba0023137ba3&From=%2B17208884444&MediaUrl0=https%3A%2F%2Fapi.twilio.com%2F2010-04-01%2FAccounts%2FAC51065da8ef8171360073ba0023137ba3%2FMessages%2FMM0ab821fa95eeecea1eadd2f9d2414997%2FMedia%2FMEcf6f27737f63106f76c895195ade7a29&ApiVersion=2010-04-01
 	//   #schema:
 	//   # "$ref": "#/definitions/InboundMMSQuery"
 	// responses:
@@ -44,7 +45,11 @@ func SMSHandler(w http.ResponseWriter, r *http.Request) {
 	//   '400':
 	//     description: Bad Request
 	//     type: string
+	//   '401':
+	//     description: Unauthorized
+	//     type: string
 
+	var resp string
 	// Dump the request body (for debugging only)
 	r.Body = utils.DumpRequestBody(r.Body)
 	buf, bodyErr := ioutil.ReadAll(r.Body)
@@ -87,6 +92,16 @@ func SMSHandler(w http.ResponseWriter, r *http.Request) {
 	// Save a copy of this request for debugging.
 	//utils.DumpRequest(r)
 
+	if allowed := utils.IsWhiteListed(inboundMMS.From, &AllowedSenders); allowed != true {
+		resp = `<?xml version="1.0" encoding="UTF-8"?>
+		<Response>
+		<Message>Sorry, this number is not allowed!</Message>
+		</Response>`
+
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintf(w, "%s", resp)
+		return
+	}
 	// Copy image from source S3 bucket to destination S3 Bucket
 
 	mediaLocation, _ := utils.GetFileLocation(inboundMMS.MediaURL0)
@@ -127,24 +142,10 @@ func SMSHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var resp string
-	if utils.IsWhiteListed(inboundMMS.From, &[]string{"12345"}) {
-		resp = `<?xml version="1.0" encoding="UTF-8"?>
+	resp = `<?xml version="1.0" encoding="UTF-8"?>
 		<Response>
-		<Message>Photo copied successfully!</Message>
+		<Message>Photo uploaded successfully!</Message>
 		</Response>`
-	} else {
-		resp = `<?xml version="1.0" encoding="UTF-8"?>
-		<Response>
-		<Message>Sorry, not allowed!</Message>
-		</Response>`
-	}
-
-	/* resp := &struct {
-		Response string
-	}{
-		"Okay",
-	} */
 	go utils.InvokeUpdate(GalleryUpdateURL)
 	w.WriteHeader(http.StatusOK)
 	//json, _ := json.MarshalIndent(resp, "", "  ")
