@@ -1,4 +1,4 @@
-VERSION=0.0.2
+VERSION=0.0.3
 IMAGE_NAME=sgryczan/photouploader
 IMAGE_TAG=${VERSION}
 GCLOUD_PROJECT=ivory-vim-222512
@@ -19,7 +19,7 @@ push: ## Push the image
 run: ## Run the image
 	docker run \
 		-p 8080:8080 \
-		--env-file creds.ignore \
+		--env-file env.ignore \
 		${IMAGE_NAME}:${IMAGE_TAG}
 
 .PHONY: test
