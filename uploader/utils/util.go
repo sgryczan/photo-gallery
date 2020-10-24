@@ -18,17 +18,25 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
-// ExtractDict accepts a dict of a parsed query, and returns
+// ExtractDict accepts a parsed query, and returns
 // an inboundMMS object with the field values extracted
 func ExtractDict(m map[string][]string) (map[string]interface{}, error) {
 	dict := map[string]interface{}{}
+	mediaURLs := map[string]string{}
+
 	// Convert dictionary to usable struct
 	for key, value := range m {
 		if key == "NumSegments" || key == "NumMedia" {
 			dict[key], _ = strconv.Atoi(value[0])
 		}
+		if strings.HasPrefix(key, "MediaUrl") {
+			log.Printf("Extracting %s", key)
+			mediaURLs[key] = value[0]
+			continue
+		}
 		dict[key] = value[0]
 	}
+	dict["MediaURLs"] = mediaURLs
 	return dict, nil
 }
 
@@ -60,7 +68,6 @@ func DumpRequest(r *http.Request) error {
 func followRedirect(req *http.Request, via []*http.Request) error {
 	log.Printf("Redirected to: %s://%s%s", req.URL.Scheme, req.URL.Host, req.URL.Path)
 	if strings.HasPrefix(req.URL.Host, "s3-external-") {
-		log.Println("this looks like an S3 host, stopping here")
 		return errors.New("error")
 	}
 

@@ -7,18 +7,18 @@ type InboundMMS struct {
 	MediaContentType0 string
 	ToState           string
 	SMSMessageSid     string
-	NumMedia          string
+	NumMedia          int `json:"NumMedia,string"`
 	ToCity            string
 	FromZip           string
 	Body              string
 	FromCountry       string
 	To                string
 	ToZip             string
-	NumSegments       string
+	NumSegments       int `json:"NumSegments,string"`
 	MessageSid        string
 	AccountSid        string
 	From              string
-	MediaURL0         string
+	MediaURLs         map[string]string
 	APIVersion        string
 }
 
